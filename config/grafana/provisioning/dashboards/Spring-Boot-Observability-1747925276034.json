@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 3,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -832,10 +832,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "exemplar": true,
           "expr": "sum by(uri)(rate(http_server_requests_seconds_count{application=\"$app_name\"}[1m]))",
-          "interval": "",
-          "legendFormat": "{{uri}}",
           "range": true,
           "refId": "A"
         }
@@ -846,7 +843,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "aemnelm2o2waoa"
+        "uid": "P982945308D3682D1"
       },
       "fieldConfig": {
         "defaults": {
@@ -945,6 +942,36 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "{level=\"INFO\"}"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "{level=\"ERROR\"}"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -973,12 +1000,11 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "aemnelm2o2waoa"
+            "uid": "P982945308D3682D1"
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by(level) (rate({app=\"spring-metrics-starter\"} | pattern `<date> <time> <_>=<trace_id> <_>=<span_id> <_>=<trace_flags> <type> <_> --- <msg>` |= \"$log_keyword\" [1m]))",
-          "legendFormat": "{{type}}",
+          "expr": "sum by(level) (rate({app=\"spring-metrics-starter\"} | pattern `<date> <time> <_>=<trace_id> <_>=<span_id> <_>=<trace_flags> <type> <_> --- <msg>` |= \"$log_keyword\" [1m]))\n",
           "queryType": "range",
           "refId": "A"
         }
@@ -989,7 +1015,7 @@
     {
       "datasource": {
         "type": "loki",
-        "uid": "aemnelm2o2waoa"
+        "uid": "P982945308D3682D1"
       },
       "fieldConfig": {
         "defaults": {},
@@ -1018,13 +1044,11 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "aemnelm2o2waoa"
+            "uid": "P982945308D3682D1"
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{app=\"spring-metrics-starter\"} \n| pattern \"<time> <level> [<thread>] <logger> - <msg>\" \n| line_format \"{{.level}}\\t{{.thread}}\\t{{.logger}}\\t{{.msg}}\"\n",
-          "hide": false,
-          "legendFormat": "",
+          "expr": "{app=\"spring-metrics-starter\"}",
           "queryType": "range",
           "refId": "A"
         }
@@ -1099,5 +1123,5 @@
   "timezone": "",
   "title": "Spring Boot Observability",
   "uid": "dLsDQIUnzb",
-  "version": 9
+  "version": 7
 }

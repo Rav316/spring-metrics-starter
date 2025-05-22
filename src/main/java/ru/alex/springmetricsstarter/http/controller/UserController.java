@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+    private final Random random = new Random();
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final Map<Integer, String> users = IntStream.rangeClosed(1, 20)
             .boxed()
@@ -27,7 +29,12 @@ public class UserController {
 
     @GetMapping
     public Map<Integer, String> findAll() {
-        log.info("findAll log");
+        int randomNumber = random.nextInt(6);
+        if(randomNumber % 2 == 0) {
+            log.error("findAll error log");
+        } else {
+            log.info("findAll info log");
+        }
         return users;
     }
 

@@ -1,3 +1,6 @@
+prometheus/
+logs/
+grafana/
 HELP.md
 .gradle
 build/
