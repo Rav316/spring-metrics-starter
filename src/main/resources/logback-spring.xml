@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Подстановка имени приложения из spring.application.name -->
+    <springProperty scope="context" name="name" source="spring.application.name" />
+
+    <!-- Цветной консольный аппендер -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>
+                %d{HH:mm:ss.SSS} %highlight(%-5level) [%cyan(%thread)] %green(%logger{36}) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Loki4j аппендер -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>http://localhost:3100/loki/api/v1/push</url>
+        </http>
+
+        <format>
+            <label>
+                <pattern>app=${name},host=${HOSTNAME},level=%level</pattern>
+                <readMarkers>true</readMarkers>
+            </label>
+            <message>
+                <pattern>
+                    {
+                    "level":"%level",
+                    "class":"%logger{36}",
+                    "thread":"%thread",
+                    "message": "%message",
+                    "requestId": "%X{X-Request-ID}"
+                    }
+                </pattern>
+            </message>
+        </format>
+    </appender>
+
+    <!-- Логгер для пакета ru.alex -->
+    <logger name="ru.alex" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOKI" />
+    </logger>
+
+    <!-- Общий логгер -->
+    <root level="INFO">
+        <appender-ref ref="LOKI"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

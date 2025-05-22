@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: spring-metrics-starter
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
