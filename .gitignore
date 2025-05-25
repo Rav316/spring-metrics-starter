@@ -1,5 +1,6 @@
 prometheus/
 logs/
+loki_data/
 grafana/
 HELP.md
 .gradle
