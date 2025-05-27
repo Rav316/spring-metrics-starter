@@ -22,8 +22,12 @@
 
         <http>
             <url>
-                http://localhost:3100/loki/api/v1/push
+                http://localhost/loki/api/v1/push
             </url>
+            <auth>
+                <username>alex</username>
+                <password>test</password>
+            </auth>
         </http>
         <format>
             <label>
