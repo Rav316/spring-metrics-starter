@@ -1,0 +1,8 @@
+ext {
+    projectGroup = 'ru.alex'
+    projectVersion = '1.0.0'
+    versions = [
+            'loki4j': '1.6.0',
+            'logstash': '8.1'
+    ]
+}

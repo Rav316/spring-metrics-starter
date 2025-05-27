@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- Подстановка имени приложения из spring.application.name -->
-    <springProperty scope="context" name="name" source="spring.application.name" />
 
-    <!-- Цветной консольный аппендер -->
+    <!-- Color console appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>
@@ -12,40 +10,62 @@
         </encoder>
     </appender>
 
-    <!-- Loki4j аппендер -->
-    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
-        <http>
-            <url>http://192.168.0.114:3100/loki/api/v1/push</url>
-        </http>
+    <appender name="ASYNC_LOKI" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>16384</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="LOKI_DIRECT" />
+    </appender>
 
+    <appender name="LOKI_DIRECT" class="com.github.loki4j.logback.Loki4jAppender">
+        <batchTimeoutMs>10000</batchTimeoutMs>
+
+        <http>
+            <url>
+                http://localhost:3100/loki/api/v1/push
+            </url>
+        </http>
         <format>
             <label>
-                <pattern>app=${name},host=${HOSTNAME},level=%level</pattern>
-                <readMarkers>true</readMarkers>
-            </label>
-            <message>
                 <pattern>
-                    {
-                    "level":"%level",
-                    "class":"%logger{36}",
-                    "thread":"%thread",
-                    "message": "%message",
-                    "requestId": "%X{X-Request-ID}"
-                    }
+                    app=${spring.application.name:-spring-metrics-starter}
                 </pattern>
-            </message>
+                <structuredMetadataPattern>
+                    level = %level,
+                    thread = %thread,
+                    class = %logger,
+                    userId = %mdc{userId:-none}
+                </structuredMetadataPattern>
+            </label>
+            <staticLabels>true</staticLabels>
+            <message class="com.github.loki4j.logback.JsonLayout" />
         </format>
     </appender>
 
-    <!-- Логгер для пакета ru.alex -->
-    <logger name="ru.alex" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE" />
-        <appender-ref ref="LOKI" />
-    </logger>
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/application.json</file>
 
-    <!-- Общий логгер -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/application.%d{yyyy-MM-dd}.%i.json.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <timeZone>UTC</timeZone>
+            <customFields>
+                {
+                "service": "${spring.application.name:-spring-boot-crash-course}",
+                "env": "${spring.profiles.active:-prod}"
+                }
+            </customFields>
+        </encoder>
+    </appender>
+
+    <!-- General logger -->
     <root level="INFO">
-        <appender-ref ref="LOKI"/>
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="ASYNC_LOKI" />
+        <appender-ref ref="JSON_FILE" />
     </root>
 </configuration>
